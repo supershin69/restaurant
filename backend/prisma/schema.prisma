@@ -22,7 +22,10 @@ model User {
   role      Role     @default(WAITER)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  profile   Profile?
+  branchId  String?  @map("branch_id")
+
+  profile Profile?
+  branch  Branch?  @relation(fields: [branchId], references: [id], onDelete: Restrict)
 
   @@map("users")
 }
@@ -37,4 +40,16 @@ model Profile {
   user         User     @relation(fields: [userId], references: [id])
 
   @@map("profiles")
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("branches")
 }

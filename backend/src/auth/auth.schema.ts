@@ -6,6 +6,7 @@ export const registerSchema = z.object({
     email: z.email("Please enter a valid email address"),
     password: z.string("Password is required").min(6, "Password should be at least 6 characters long."),
     confirmPassword: z.string("Confirm password is required").min(6, "Confirm password should be at least 6 characters long."),
+    branchId: z.string().optional().nullable(),
     role: z.enum([Role.COOK, Role.MANAGER, Role.OWNER, Role.WAITER])
 });
 
