@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { Role } from "../../generated/prisma/enums.js";
+import { Role } from "../generated/prisma/enums.js";
 
 export const registerSchema = z.object({
     name: z.string("Name is required."),
