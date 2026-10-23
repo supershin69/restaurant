@@ -1,0 +1,219 @@
+[
+  {
+    "id": "dropCheckConstraint.profiles.profiles_role_check_edcfd911",
+    "label": "Drop check constraint \"profiles_role_check_edcfd911\" on \"profiles\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "profiles_role_check_edcfd911",
+        "table": "profiles"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"profiles_role_check_edcfd911\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "profiles_role_check_edcfd911",
+          "public",
+          "\"public\".\"profiles\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "constraint \"profiles_role_check_edcfd911\" on \"profiles\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"profiles_role_check_edcfd911\"",
+        "sql": "ALTER TABLE \"public\".\"profiles\" DROP CONSTRAINT \"profiles_role_check_edcfd911\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"profiles_role_check_edcfd911\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "profiles_role_check_edcfd911",
+          "public",
+          "\"public\".\"profiles\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"profiles_role_check_edcfd911\" on \"profiles\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "dropColumn.profiles.role",
+    "label": "Drop column \"role\" from \"profiles\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "role",
+        "table": "profiles"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"role\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profiles",
+          "role"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"role\" on \"profiles\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"role\"",
+        "sql": "ALTER TABLE \"public\".\"profiles\" DROP COLUMN \"role\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"role\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "profiles",
+          "role"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"role\" on \"profiles\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "column.public.users.role",
+    "label": "Add column \"role\" to \"users\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "role",
+        "table": "users"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"role\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "users",
+          "role"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"role\" on \"users\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"role\"",
+        "sql": "ALTER TABLE \"public\".\"users\" ADD COLUMN \"role\" text DEFAULT 'WAITER' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"role\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "users",
+          "role"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"role\" on \"users\""
+        }
+      },
+      {
+        "description": "verify column \"role\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "users",
+          "role",
+          "text"
+        ]
+      },
+      {
+        "description": "verify column \"role\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "users",
+          "role",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.users.users_role_check_edcfd911",
+    "label": "Add check constraint \"users_role_check_edcfd911\" on \"users\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "users_role_check_edcfd911",
+        "table": "users"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"users_role_check_edcfd911\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "users_role_check_edcfd911",
+          "public",
+          "\"public\".\"users\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"users_role_check_edcfd911\" on \"users\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"users_role_check_edcfd911\"",
+        "sql": "ALTER TABLE \"public\".\"users\" ADD CONSTRAINT \"users_role_check_edcfd911\" CHECK (\"role\" IN ('OWNER', 'MANAGER', 'COOK', 'WAITER'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify check constraint \"users_role_check_edcfd911\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4)) AS \"result\"",
+        "params": [
+          "users_role_check_edcfd911",
+          "public",
+          "\"public\".\"users\"",
+          "c"
+        ]
+      }
+    ]
+  }
+]
